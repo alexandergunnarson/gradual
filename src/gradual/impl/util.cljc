@@ -4,7 +4,6 @@
            [any? boolean? double? ident? pos-int? qualified-keyword? seqable? simple-symbol?])
          (:require
            [clojure.core           :as core]
-   #?(:clj [clojure.future         :as fcore])
            [clojure.spec.alpha     :as s]
            [clojure.spec.gen.alpha :as gen])
 #?(:cljs (:require-macros
@@ -86,6 +85,10 @@
 
 ;; The reason we use `resolve` and `eval` here is that currently we need to prefer built-in impls
 ;; where possible in order to leverage their generators
+
+#?(:clj
+(try (require '[clojure.future :as fcore])
+  (catch Throwable _)))
 
 #?(:clj  (eval `(defalias ~(if (resolve `fcore/any?)
                                `fcore/any?

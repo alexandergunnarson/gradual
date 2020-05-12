@@ -10,21 +10,19 @@
    [org.clojure/test.check "0.9.0"]])
 
 (def deps|clj-1-9-0
- '[[clojure-future-spec    "1.9.0"]
-   [frankiesardo/linked    "1.2.9"]
+ '[[frankiesardo/linked    "1.2.9"]
    [org.clojure/clojure    "1.9.0"]
    [org.clojure/spec.alpha "0.1.143"]
    [org.clojure/test.check "0.9.0"]])
 
 (def deps|clj-1-10-0
- '[[clojure-future-spec    "1.9.0"]
-   [frankiesardo/linked    "1.2.9"]
+ '[[frankiesardo/linked    "1.2.9"]
    [org.clojure/clojure    "1.10.0"]
    [org.clojure/spec.alpha "0.2.176"]
    [org.clojure/test.check "0.9.0"]])
 
 (def project-name 'gradual/gradual)
-(def version "0.1.0")
+(def version "0.1.1")
 
 (defn >base-profile [profile-ident #_keyword?]
   (let [relativized-version
