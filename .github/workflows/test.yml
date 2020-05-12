@@ -3,7 +3,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@latest
     - uses: actions/setup-java@v1
       with:
         java-version: 1.8
