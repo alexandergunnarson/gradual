@@ -10,15 +10,13 @@
    [org.clojure/test.check "0.9.0"]])
 
 (def deps|clj-1-9-0
- '[[clojure-future-spec    "1.9.0"]
-   [frankiesardo/linked    "1.2.9"]
+ '[[frankiesardo/linked    "1.2.9"]
    [org.clojure/clojure    "1.9.0"]
    [org.clojure/spec.alpha "0.1.143"]
    [org.clojure/test.check "0.9.0"]])
 
 (def deps|clj-1-10-0
- '[[clojure-future-spec    "1.9.0"]
-   [frankiesardo/linked    "1.2.9"]
+ '[[frankiesardo/linked    "1.2.9"]
    [org.clojure/clojure    "1.10.0"]
    [org.clojure/spec.alpha "0.2.176"]
    [org.clojure/test.check "0.9.0"]])
