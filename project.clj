@@ -22,7 +22,7 @@
    [org.clojure/test.check "0.9.0"]])
 
 (def project-name 'gradual/gradual)
-(def version "0.1.0")
+(def version "0.1.1")
 
 (defn >base-profile [profile-ident #_keyword?]
   (let [relativized-version
