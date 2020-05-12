@@ -1,7 +1,7 @@
 # `gradual`
 
 ![.github/workflows/test.yml](https://github.com/alexandergunnarson/gradual/workflows/.github/workflows/test.yml/badge.svg)
-[![Clojars Project](https://img.shields.io/clojars/v/alexandergunnarson/gradual.svg)](https://clojars.org/alexandergunnarson/gradual)
+[![Clojars Project](https://img.shields.io/clojars/v/gradual.svg)](https://clojars.org/gradual)
 
 Gradual, dependent typing for Clojure. Also comes with [`clojure.spec`](https://clojure.org/about/spec) interop (see `gradual.spec`).
 
