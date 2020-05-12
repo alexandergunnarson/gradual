@@ -1,6 +1,6 @@
 # `gradual`
 
-[![CircleCI](https://circleci.com/gh/alexandergunnarson/gradual/tree/master.svg?style=svg)](https://circleci.com/gh/alexandergunnarson/gradual/tree/master)
+![.github/workflows/test.yml](https://github.com/alexandergunnarson/gradual/workflows/.github/workflows/test.yml/badge.svg)
 [![Clojars Project](https://img.shields.io/clojars/v/alexandergunnarson/gradual.svg)](https://clojars.org/alexandergunnarson/gradual)
 
 Gradual, dependent typing for Clojure. Also comes with [`clojure.spec`](https://clojure.org/about/spec) interop (see `gradual.spec`).
