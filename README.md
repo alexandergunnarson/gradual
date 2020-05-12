@@ -5,7 +5,7 @@
 
 Gradual, dependent typing for Clojure. Also comes with [`clojure.spec`](https://clojure.org/about/spec) interop (see `gradual.spec`).
 
-The successor of https://github.com/alexandergunnarson/defnt, which is too narrowly named.
+The successor of [alexandergunnarson/defnt](https://github.com/alexandergunnarson/defnt), which is too narrowly named.
 
 Related Works
 ---
