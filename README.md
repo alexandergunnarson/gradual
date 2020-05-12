@@ -13,7 +13,7 @@ Related Works
 - [Orchestra](https://github.com/jeaye/orchestra)'s `defn-spec` was developed independently, but surprisingly yields some very similar ideas with respect to `gradual.spec/defn` (see below) and even a similar interface for specs on function arguments.
 - [Spectrum](https://github.com/arohner/spectrum) was also developed independently, and shares `gradual.typed`'s idea of performing spec conformance checks at compile time (though it aims exclusively for "there-exists" checks via generative testing; `gradual.type` also provides as many compile-time "for-all" proofs as it can before falling back to compile-time generative testing and/or runtime spec checks).
 
-# Typed bindings
+# Typed bindings (`gradual.type`)
 
 *(Work in progress — check back later.)*
 
