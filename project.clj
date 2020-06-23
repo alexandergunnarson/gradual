@@ -63,7 +63,9 @@
    :license      {:name         "Creative Commons Attribution-ShareAlike 3.0 US (CC-SA)"
                   :url          "https://creativecommons.org/licenses/by-sa/3.0/us/"
                   :distribution :repo}
-   :dependencies deps|latest
+   :dependencies (->> deps|latest
+                      (remove #(-> % first (= 'org.clojure/spec.alpha)))
+                      vec)
    :deploy-repositories
      {"clojars" {:url "https://repo.clojars.org" :username :gpg :password :gpg}}
    :profiles     profiles})
