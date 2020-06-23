@@ -206,7 +206,18 @@
 
 ;; ===== Implementation ===== ;;
 
-(core/defn >seq-destructuring-spec
+#?(:clj
+(defmacro ^:internal s*
+  "Qualifies the calling symbol with `(clojure|cljs).spec.alpha`, depending on the evaluating lang."
+  [caller-sym & args]
+  (let [caller-sym' (symbol
+                      (case (u/env-lang)
+                        :clj  "clojure.spec.alpha"
+                        :cljs "cljs.spec.alpha")
+                      (name caller-sym))]
+    (list* caller-sym' args))))
+
+(core/defn ^:internal >seq-destructuring-spec
   "Creates a spec that performs seq destructuring, and provides a default generator for such based
    on the generators of the destructured args."
   [positional-destructurer most-complex-positional-destructurer kv-spec or|conformer seq-spec
@@ -237,7 +248,7 @@
                           (s/conform most-complex-positional-destructurer|unformer x))))))))
 
 #?(:clj
-(defmacro seq-destructure
+(defmacro ^:internal seq-destructure
   "If `generate-from-seq-spec?` is true, generates from `seq-spec`'s generator instead of the
    default generation strategy based on the generators of the destructured args."
   [seq-spec #_any? args #_(s/* (s/cat :k keyword? :spec any?))
@@ -247,28 +258,28 @@
         varargs (u/validate (s/nilable (s/cat :k keyword? :spec any?)) varargs)
         args-ct>args-kw #(keyword (str "args-" %))
         arity>cat (core/fn [arg-i]
-                   `(s/cat ~@(->> args (take arg-i)
-                                       (map (core/fn [{:keys [k spec]}] [k `any?]))
-                                       (apply concat))))
+                   `(s* cat ~@(->> args (take arg-i)
+                                        (map (core/fn [{:keys [k spec]}] [k `any?]))
+                                        (apply concat))))
         most-complex-positional-destructurer-sym (gensym "most-complex-positional-destructurer")]
    `(let [~most-complex-positional-destructurer-sym
-            (s/cat ~@(->> args
-                          (map (core/fn [{:keys [k]}] [k `any?]))
-                          (apply concat))
-                   ~@(when varargs [(:k varargs) `(s/& (s/+ any?) (s/conformer seq identity))]))
+            (s* cat ~@(->> args
+                           (map (core/fn [{:keys [k]}] [k `any?]))
+                           (apply concat))
+                    ~@(when varargs [(:k varargs) `(s* & (s* + any?) (s* conformer seq identity))]))
           positional-destructurer#
-            (s/or :args-0 (s/cat)
-                  ~@(->> (range (count args))
-                         (map (core/fn [i] [(args-ct>args-kw (inc i)) (arity>cat (inc i))]))
-                         (apply concat))
-                  ~@(when varargs [:varargs most-complex-positional-destructurer-sym]))
+            (s* or :args-0 (s* cat)
+                    ~@(->> (range (count args))
+                           (map (core/fn [i] [(args-ct>args-kw (inc i)) (arity>cat (inc i))]))
+                           (apply concat))
+                    ~@(when varargs [:varargs most-complex-positional-destructurer-sym]))
           kv-spec#
             (u/kv (linked/map
                     ~@(apply concat
                         (cond-> (->> args (map (core/fn [{:keys [k spec]}] [k spec])))
                           varargs (concat [[(:k varargs) (:spec varargs)]])))))
           or|conformer#
-            (s/conformer
+            (s* conformer
               (core/fn or|conformer# [m#]
                 [(case (count m#)
                     ~@(->> (range (inc (count args)))
@@ -280,15 +291,16 @@
         kv-spec# or|conformer# ~seq-spec ~opts)))))
 
 #?(:clj
-(defmacro map-destructure [map-spec #_any? kv-specs #_(s/map-of any? any?)]
+(defmacro ^:internal map-destructure [map-spec #_any? kv-specs #_(s/map-of any? any?)]
   (let [kv-spec-sym (gensym "kv-spec")
         {:as opts generate-from-map-spec? :gen?} (meta map-spec)]
     `(let [~kv-spec-sym (u/kv ~kv-specs)]
        ~(if generate-from-map-spec?
-            `(s/and ~map-spec ~kv-spec-sym)
-            `(s/with-gen (s/and ~map-spec ~kv-spec-sym) (core/fn [] (s/gen ~kv-spec-sym))))))))
+            `(s* and ~map-spec ~kv-spec-sym)
+            `(s* with-gen (s* and ~map-spec ~kv-spec-sym) (core/fn [] (s* gen ~kv-spec-sym))))))))
 
-(core/defn speced-binding>binding [{[kind binding-] :binding-form} #_:gradual/speced-binding]
+(core/defn ^:internal speced-binding>binding
+  [{[kind binding-] :binding-form} #_:gradual/speced-binding]
   (case kind
     :sym binding-
     :seq (let [{:keys [as elems] rest- :rest} binding-]
@@ -305,7 +317,7 @@
                         (get-in v [:key+spec :key])])))
               (into {}))))
 
-(core/defn speced-binding>arg-ident
+(core/defn ^:internal speced-binding>arg-ident
   [{[kind binding-] :binding-form} #_:gradual/speced-binding & [i|arg] #_(? nneg-integer?)]
   (u/>keyword
     (case kind
@@ -362,11 +374,11 @@
 
 (core/defn arglist>spec-form|arglist
   [args+varargs kw-args #_:gradual/map-binding-form]
-  `(s/cat ~@(u/reduce-2
-              (core/fn [ret speced-binding [_ kw-arg]]
-                (conj ret kw-arg (speced-binding>spec speced-binding)))
-              []
-              args+varargs kw-args)))
+  `(s* cat ~@(u/reduce-2
+               (core/fn [ret speced-binding [_ kw-arg]]
+                 (conj ret kw-arg (speced-binding>spec speced-binding)))
+               []
+               args+varargs kw-args)))
 
 ;; TODO handle duplicate bindings (e.g. `_`) by `s/cat` using unique keys — e.g. :b|arg-2
 (core/defn fn|code [kind lang args]
@@ -395,11 +407,11 @@
                     spec-form|pre     (when (and (contains? arglist :pre) (= pre-kind :spec))
                                         `(core/fn [~kw-args] ~pre))
                     spec-form|args*   (if spec-form|pre
-                                          `(s/and ~spec-form|arglist ~spec-form|pre)
+                                          `(s* and ~spec-form|arglist ~spec-form|pre)
                                           spec-form|arglist)
                     spec-form|fn*     (if (contains? arglist :post)
-                                          `(let [~kw-args ~args-sym] (s/spec ~post))
-                                          `(s/spec any?))]
+                                          `(let [~kw-args ~args-sym] (s* spec ~post))
+                                          `(s* spec any?))]
                 (-> ret
                     (update :overload-forms conj overload-form)
                     (update :spec-form|args conj arity-ident spec-form|args*)
@@ -409,10 +421,10 @@
              :spec-form|fn   []}
             overloads)
         spec-form (when (#{:defn :defn-} kind)
-                    `(s/fdef ~fn|name :args (s/or ~@spec-form|args)
-                                      :fn   (u/with-gen-spec (core/fn [{~ret-sym :ret}] ~ret-sym)
-                                              (core/fn [{[~arity-kind-sym ~args-sym] :args}]
-                                                (case ~arity-kind-sym ~@spec-form|fn)))))
+                    `(s* fdef ~fn|name :args (s* or ~@spec-form|args)
+                                       :fn   (u/with-gen-spec (core/fn [{~ret-sym :ret}] ~ret-sym)
+                                               (core/fn [{[~arity-kind-sym ~args-sym] :args}]
+                                                 (case ~arity-kind-sym ~@spec-form|fn)))))
         fn-form (case kind
                   :fn    (list* 'fn (concat (when (contains? args' :gradual/fn|name)
                                               [fn|name])
