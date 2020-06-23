@@ -1,6 +1,6 @@
 on: [push]
 jobs:
-  test:
+  test-clj:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -10,4 +10,21 @@ jobs:
     - uses: DeLaGuardo/setup-clojure@2.0
       with:
         lein: 2.9.1
-    - run: lein with-profile clj-1.8.0 test && lein with-profile clj-1.9.0 test && lein with-profile clj-1.10.0 test
+    - name: Test
+      run: lein with-profile clj-1.8.0 test && lein with-profile clj-1.9.0 test && lein with-profile clj-1.10.0 test
+  test-cljs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: docker://timbru31/java-node:latest
+    - uses: actions/checkout@v2
+    - name: Cache CLJ/CLJS dependencies
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-clj
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('shadow-cljs.edn') }}
+        restore-keys: |
+          ${{ runner.os }}-clj
+    - name: Test
+      run: yarn && yarn shadow-cljs compile test && node ./target/test.js

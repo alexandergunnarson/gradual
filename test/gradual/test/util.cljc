@@ -1,6 +1,11 @@
 (ns gradual.test.util
   (:require
+    [gradual.impl.util       :as u]
     [clojure.spec.alpha      :as s]
+    ;; Needs to be required for `stest/check` to be called
+    [clojure.test.check]
+    ;; Needs to be required for `stest/check` to be called
+    [clojure.test.check.properties]
     [clojure.spec.test.alpha :as stest]
     [clojure.string          :as str]
     [clojure.test            :as test]))
@@ -28,7 +33,13 @@
   {:based-on "https://gist.github.com/kennyjwilli/8bf30478b8a2762d2d09baabc17e2f10"}
   ([name sym-or-syms] `(defspec-test ~name ~sym-or-syms nil))
   ([name sym-or-syms opts]
-   (when test/*load-tests*
-     `(defn ~(vary-meta name assoc :test
-              `(fn [] (report-results (stest/check ~sym-or-syms ~opts))))
-        [] (test/test-var (var ~name)))))))
+    (when test/*load-tests*
+      (let [check-sym    (u/case-env
+                           :clj  'clojure.spec.test.alpha/check
+                           :cljs 'cljs.spec.test.alpha/check)
+            test-var-sym (u/case-env
+                           :clj  'clojure.test/test-var
+                           :cljs 'cljs.test/test-var)]
+        `(defn ~(vary-meta name assoc :test
+                 `(fn [] (report-results (~check-sym ~sym-or-syms ~opts))))
+           [] (~test-var-sym (var ~name))))))))
