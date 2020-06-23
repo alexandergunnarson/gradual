@@ -24,7 +24,7 @@
 (def deps|latest deps|clj-1-10-0)
 
 (def project-name 'gradual/gradual)
-(def version "0.1.2")
+(def version "0.1.3")
 
 (defn >base-profile [profile-ident #_keyword?]
   (let [relativized-version
@@ -40,10 +40,9 @@
   (let [dev-test {:global-vars '{*warn-on-reflection* true
                                  *unchecked-math*     :warn-on-boxed}}]
     {:dev        (merge dev-test
-                   {:dependencies (conj deps|latest
-                                    '[expound   "0.8.4"]
-                                    '[orchestra "2019.02.06-1"]
-                                    '[leiningen "2.9.3"])})
+                   {:dependencies '[[expound   "0.8.4"]
+                                    [leiningen "2.9.3"]
+                                    [orchestra "2019.02.06-1"]]})
      :dev-test   dev-test
      :test       (merge dev-test)
      :clj-1.8.0  (-> (>base-profile :clj-1.8.0)
