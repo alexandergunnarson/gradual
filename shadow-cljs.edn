@@ -1,0 +1,5 @@
+;; NOTE: this is for testing only. It assumes same CLJS and cljs.spec versions as shadow-cljs.
+{:builds       {:test {:output-to "target/test.js"
+                       :target    :node-test}}
+ :dependencies [[frankiesardo/linked "1.2.9"]]
+ :source-paths ["src" "test"]}

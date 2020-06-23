@@ -1,17 +1,23 @@
 (ns gradual.spec-test
-  (:refer-clojure :exclude
-    [boolean? double? pos-int?])
-  (:require
-    [clojure.spec.alpha         :as s]
-    [clojure.spec.gen.alpha     :as gen]
-    [clojure.spec.test.alpha    :as stest]
-    [clojure.test.check.clojure-test
-      :refer [defspec]]
-    [gradual.impl.util          :as u
-      :refer [boolean? double? pos-int?]]
-    [gradual.spec               :as gs]
-    [gradual.test.util
-      :refer [defspec-test]]))
+         (:refer-clojure
+           :exclude [boolean? double? number? pos-int?])
+         (:require
+           [clojure.core       :as clj]
+           [clojure.spec.alpha :as s]
+           [gradual.impl.util  :as u
+             :refer [boolean? double? pos-int?]]
+           [gradual.spec       :as gs]
+           [gradual.test.util  :as tu])
+#?(:cljs (:require-macros
+           [gradual.spec-test
+             :refer [defn-test]])))
+
+(defn- nan? [x]
+  #?(:clj  (Double/isNaN x)
+     :cljs (js/isNaN x)))
+
+(def ^:private number?
+  (s/and clj/number? #(not (nan? %))))
 
 ;; Implicit compilation tests
 (gs/defn abcde "Documentation" {:metadata "abc"}
@@ -41,7 +47,7 @@
 #?(:clj
 (defmacro defn-test [sym & args]
   `(do (gs/defn ~sym ~@args)
-       (defspec-test ~(symbol (str "test|" sym)) (symbol (str (ns-name *ns*)) ~(str sym))))))
+       (tu/defspec-test ~(symbol (str "test|" sym)) (symbol (str (ns-name *ns*)) ~(str sym))))))
 
 (defn-test basic [a number? > number?] (rand))
 

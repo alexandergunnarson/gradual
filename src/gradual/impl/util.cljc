@@ -189,7 +189,7 @@
   "Based on `s/map-spec-impl`"
   ([k->s #_(s/map-of any? specable?)] (kv k->s nil))
   ([k->s #_(s/map-of any? specable?) gen-fn #_(? fn?)]
-    (let [id (java.util.UUID/randomUUID)
+    (let [id #?(:clj (java.util.UUID/randomUUID) :cljs random-uuid)
           k->s|desc (->> k->s
                          (map (fn [[k specable]]
                                 [k (if (ident? specable) specable (s/describe specable))]))
