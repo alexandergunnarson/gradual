@@ -1,14 +1,16 @@
 (ns gradual.spec
-  (:refer-clojure :exclude
-    [any? fn defn defn- ident? qualified-keyword? seqable? simple-symbol?])
-  (:require
-    [clojure.core           :as core]
-    [clojure.set            :as set]
-    [clojure.spec.alpha     :as s]
-    [clojure.spec.gen.alpha :as gen]
-    [gradual.impl.util      :as u
-      :refer [any? ident? qualified-keyword? seqable? simple-symbol?]]
-    [linked.core            :as linked]))
+         (:refer-clojure :exclude
+           [any? fn defn defn- ident? qualified-keyword? seqable? simple-symbol?])
+         (:require
+           [clojure.core           :as core]
+           [clojure.set            :as set]
+           [clojure.spec.alpha     :as s]
+           [clojure.spec.gen.alpha :as gen]
+           [gradual.impl.util      :as u
+             :refer [any? ident? qualified-keyword? seqable? simple-symbol?]]
+           [linked.core            :as linked])
+#?(:cljs (:require-macros
+           [gradual.spec])))
 
 ;; ===== Specs ===== ;;
 
@@ -382,7 +384,6 @@
 
 ;; TODO handle duplicate bindings (e.g. `_`) by `s/cat` using unique keys — e.g. :b|arg-2
 (core/defn fn|code [kind lang args]
-  (assert (= lang #?(:clj :clj :cljs :cljs)) lang)
   (when (= kind :fn) (println "WARNING: `fn` will ignore spec validation"))
   (let [{:keys [:gradual/fn|name overloads :gradual/meta] :as args'}
           (u/validate (case kind (:defn :defn-) :gradual.spec/defn|code
