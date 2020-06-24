@@ -4,6 +4,7 @@
          (:require
            [clojure.core       :as clj]
            [clojure.spec.alpha :as s]
+           [clojure.test       :as test]
            [gradual.impl.util  :as u
              :refer [boolean? double? pos-int?]]
            [gradual.spec       :as gs]
@@ -48,6 +49,11 @@
 (defmacro defn-test [sym & args]
   `(do (gs/defn ~sym ~@args)
        (tu/defspec-test ~(symbol (str "test|" sym)) (symbol (str (ns-name *ns*)) ~(str sym))))))
+
+(test/deftest correct-env
+  (test/is (= (first (macroexpand-1 '(gradual.spec/s* some-random-sym)))
+              #?(:clj  'clojure.spec.alpha/some-random-sym
+                 :cljs 'cljs.spec.alpha/some-random-sym))))
 
 (defn-test basic [a number? > number?] (rand))
 

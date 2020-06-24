@@ -47,7 +47,7 @@
              (case-env :clj `(+ ~a 2) :cljs `(+ ~a 1) `(+ ~a 3)))}
   ([& args] `(case-env* ~'&env ~@args))))
 
-#?(:clj (defmacro env-lang [] (case-env :clj :clj :cljs :cljs :clr :clr)))
+#?(:clj (defmacro env-lang [] `(case-env :clj :clj :cljs :cljs :clr :clr)))
 
 ;; ===== `var` ===== ;;
 

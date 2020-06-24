@@ -24,7 +24,7 @@
 (def deps|latest deps|clj-1-10-0)
 
 (def project-name 'gradual/gradual)
-(def version "0.2.1")
+(def version "0.2.2")
 
 (defn >base-profile [profile-ident #_keyword?]
   (let [relativized-version
